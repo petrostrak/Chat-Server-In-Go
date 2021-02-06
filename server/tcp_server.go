@@ -34,7 +34,7 @@ func NewServer() *TcpChatServer {
 func (s *TcpChatServer) Listen(address string) error {
 	l, err := net.Listen("tcp", address)
 	if err == nil {
-		s.listener = 1
+		s.listener = l
 	}
 	log.Printf("Listening on %v", address)
 	return err
@@ -54,6 +54,25 @@ func (s *TcpChatServer) Start() {
 			go s.serve(client)
 		}
 	}
+}
+
+func (s *TcpChatServer) Broadcast(command interface{}) error {
+	for _, client := range s.clients {
+		// TODO: handle error here?
+		client.writer.Write(command)
+	}
+
+	return nil
+}
+
+func (s *TcpChatServer) Send(name string, command interface{}) error {
+	for _, client := range s.clients {
+		if client.name == name {
+			return client.writer.Write(command)
+		}
+	}
+
+	return UnknownClient
 }
 
 func (s *TcpChatServer) accept(conn net.Conn) *client {
