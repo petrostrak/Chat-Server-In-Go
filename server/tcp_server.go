@@ -12,7 +12,7 @@ import (
 type client struct {
 	conn   net.Conn
 	name   string
-	writer *protocol.CommandeWriter
+	writer *protocol.CommandWriter
 }
 
 type TcpChatServer struct {
@@ -33,10 +33,13 @@ func NewServer() *TcpChatServer {
 
 func (s *TcpChatServer) Listen(address string) error {
 	l, err := net.Listen("tcp", address)
+
 	if err == nil {
 		s.listener = l
 	}
+
 	log.Printf("Listening on %v", address)
+
 	return err
 }
 
@@ -46,10 +49,13 @@ func (s *TcpChatServer) Close() {
 
 func (s *TcpChatServer) Start() {
 	for {
+		// XXX: need a way to break the loop
 		conn, err := s.listener.Accept()
+
 		if err != nil {
 			log.Print(err)
 		} else {
+			// handle connection
 			client := s.accept(conn)
 			go s.serve(client)
 		}

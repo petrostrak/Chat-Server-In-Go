@@ -2,44 +2,46 @@ package client
 
 import (
 	"Chat-Server-In-Go/protocol"
-	"fmt"
 	"io"
 	"log"
 	"net"
 )
 
-type TcpChatServer struct {
+type TcpChatClient struct {
 	conn      net.Conn
 	cmdReader *protocol.CommandReader
-	cmdWriter *protocol.CommandeWriter
+	cmdWriter *protocol.CommandWriter
 	name      string
 	incoming  chan protocol.MessageCommand
 }
 
-func NewClient() *TcpChatServer {
-	return &TcpChatServer{
+func NewClient() *TcpChatClient {
+	return &TcpChatClient{
 		incoming: make(chan protocol.MessageCommand),
 	}
 }
 
-func (c TcpChatServer) Dial(address string) error {
+func (c *TcpChatClient) Dial(address string) error {
 	conn, err := net.Dial("tcp", address)
-	if err != nil {
+
+	if err == nil {
 		c.conn = conn
 	}
+
 	c.cmdReader = protocol.NewCommandReader(conn)
 	c.cmdWriter = protocol.NewCommandWriter(conn)
 
 	return err
 }
 
-func (c *TcpChatServer) Start() {
+func (c *TcpChatClient) Start() {
 	for {
 		cmd, err := c.cmdReader.Read()
+
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			fmt.Printf("Read error %v", err)
+			log.Printf("Read error %v", err)
 		}
 
 		if cmd != nil {
@@ -53,23 +55,23 @@ func (c *TcpChatServer) Start() {
 	}
 }
 
-func (c *TcpChatServer) Close() {
+func (c *TcpChatClient) Close() {
 	c.conn.Close()
 }
 
-func (c *TcpChatServer) Incoming() chan protocol.MessageCommand {
+func (c *TcpChatClient) Incoming() chan protocol.MessageCommand {
 	return c.incoming
 }
 
-func (c *TcpChatServer) Send(command interface{}) error {
+func (c *TcpChatClient) Send(command interface{}) error {
 	return c.cmdWriter.Write(command)
 }
 
-func (c *TcpChatServer) SetName(name string) error {
+func (c *TcpChatClient) SetName(name string) error {
 	return c.Send(protocol.NameCommand{name})
 }
 
-func (c *TcpChatServer) SendMessage(message string) error {
+func (c *TcpChatClient) SendMessage(message string) error {
 	return c.Send(protocol.SendCommand{
 		Message: message,
 	})

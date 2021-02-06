@@ -9,10 +9,12 @@ import (
 
 func main() {
 	address := flag.String("server", "", "Which server to connect to")
+
 	flag.Parse()
 
 	client := client.NewClient()
 	err := client.Dial(*address)
+
 	if err != nil {
 		log.Fatal(err)
 	}

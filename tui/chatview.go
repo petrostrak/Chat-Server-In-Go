@@ -56,8 +56,8 @@ func NewChatView() *ChatView {
 	return view
 }
 
-func (c *ChatView) OnSubmit(hanlder SubmitMessageHandler) {
-	c.onSubmit = hanlder
+func (c *ChatView) OnSubmit(handler SubmitMessageHandler) {
+	c.onSubmit = handler
 }
 
 func (c *ChatView) AddMessage(user string, msg string) {

@@ -5,24 +5,27 @@ import (
 	"io"
 )
 
-type CommandeWriter struct {
+type CommandWriter struct {
 	writer io.Writer
 }
 
-func NewCommandWriter(w io.Writer) *CommandeWriter {
-	return &CommandeWriter{
-		writer: w,
+func NewCommandWriter(writer io.Writer) *CommandWriter {
+	return &CommandWriter{
+		writer: writer,
 	}
 }
 
-func (w *CommandeWriter) writeString(msg string) error {
+func (w *CommandWriter) writeString(msg string) error {
 	_, err := w.writer.Write([]byte(msg))
+
 	return err
 }
 
-func (w *CommandeWriter) Write(cmd interface{}) error {
+func (w *CommandWriter) Write(command interface{}) error {
+	// naive implementation ...
 	var err error
-	switch v := cmd.(type) {
+
+	switch v := command.(type) {
 	case SendCommand:
 		err = w.writeString(fmt.Sprintf("SEND %v\n", v.Message))
 	case MessageCommand:

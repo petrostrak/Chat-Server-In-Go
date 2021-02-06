@@ -10,13 +10,14 @@ type CommandReader struct {
 	reader *bufio.Reader
 }
 
-func NewCommandReader(r io.Reader) *CommandReader {
+func NewCommandReader(reader io.Reader) *CommandReader {
 	return &CommandReader{
-		reader: bufio.NewReader(r),
+		reader: bufio.NewReader(reader),
 	}
 }
 
 func (r *CommandReader) Read() (interface{}, error) {
+	// Read the first part
 	commandName, err := r.reader.ReadString(' ')
 
 	if err != nil {
@@ -26,11 +27,13 @@ func (r *CommandReader) Read() (interface{}, error) {
 	switch commandName {
 	case "MESSAGE ":
 		user, err := r.reader.ReadString(' ')
+
 		if err != nil {
 			return nil, err
 		}
 
 		message, err := r.reader.ReadString('\n')
+
 		if err != nil {
 			return nil, err
 		}
